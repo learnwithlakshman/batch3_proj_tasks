@@ -1,5 +1,6 @@
 package com.lwl.course.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -12,26 +13,22 @@ import com.lwl.course.util.CsvReaderUtil;
 public class StudentServiceImpl implements StudentService {
 
 	private List<Student> studentList;
-	
+
 	private String fileName;
-	
+
 	public StudentServiceImpl(String fileName) {
-	
-			studentList = CsvReaderUtil.getStudents(fileName);
-		
+		studentList = CsvReaderUtil.getStudents(fileName);
 	}
-	
-	
+
 	@Override
 	public List<Student> getStudentByQualification(String qualification) {
-		// TODO Auto-generated method stub
-		return null;
+		return studentList.stream().filter(s -> s.getQualification().equalsIgnoreCase(qualification))
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public int getCountBy(Predicate<Student> predicate) {
-		// TODO Auto-generated method stub
-		return 0;
+		return (int) studentList.stream().filter(predicate).count();
 	}
 
 	@Override
@@ -54,8 +51,12 @@ public class StudentServiceImpl implements StudentService {
 
 	@Override
 	public List<Student> maxScoreStudents() {
-		// TODO Auto-generated method stub
-		return null;
+		double maxScore = getMaxScore(studentList);
+		
+		  return studentList.stream()
+				  .filter(e -> e.getScore() == maxScore)
+				  .collect(Collectors.toList());
+		
 	}
 
 	@Override
@@ -69,4 +70,7 @@ public class StudentServiceImpl implements StudentService {
 		return null;
 	}
 
+	private double getMaxScore(List<Student> studentList) {
+		return studentList.stream().mapToDouble(s -> s.getScore()).boxed().max(Double::compareTo).get();
+	}
 }
